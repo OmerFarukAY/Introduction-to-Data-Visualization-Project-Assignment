@@ -8,45 +8,71 @@ import threading
 import requests
 import queue
 
+try:
+    from google import genai
+except ImportError:
+    genai = None
+
 
 # --- AYARLAR ---
 OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL_ADI = "gemini-3-flash-preview:latest"  # Ana model (F8)
+MODEL_ADI = "gemma3:1b"  # Ana model (F8)
 TEXT_MODEL_CANDIDATES = [
     MODEL_ADI,
-    "gemini-3-flash-preview:cloud",
+    "gemma3:1b",
 ]
 
-KISAYOL_METIN = keyboard.Key.f8  # Metin secimi icin kisayol
+GEMINI_MODEL = "gemini-3-flash-preview"
+GEMINI_API_KEY = "kendi api keyinizi girin"
+
+KISAYOL_METIN = keyboard.Key.f8  # Ollama icin kisayol
+KISAYOL_GEMINI = keyboard.Key.f9  # Gemini icin kisayol
 
 
 # Global değişkenler
 root = None
 gui_queue = queue.Queue()
-kisayol_basildi = False
+kisayol_basildi_key = None
 
 
 # --- MENÜ SEÇENEKLERİ VE PROMPT'LAR ---
 ISLEMLER = {
-    "📝 Gramer Düzelt": "Bu metni Türkçe yazım ve dil bilgisi kurallarına göre düzelt, resmi ve akıcı olsun. Sadece sonucu ver.",
-    "🇬🇧 İngilizceye Çevir": "Bu metni İngilizceye çevir. Sadece çeviriyi ver.",
-    "🇹🇷 Türkçeye Çevir": "Bu metni Türkçeye çevir. Sadece çeviriyi ver.",
-    "📑 Özetle (Madde Madde)": "Bu metni analiz et ve en önemli noktaları madde madde özetle.",
-    "💼 Daha Resmi Yap": "Bu metni kurumsal bir e-posta diline çevir, çok resmi olsun.",
-    "🐍 Python Koduna Çevir": "Bu metindeki isteği yerine getiren bir Python kodu yaz. Sadece kodu ver.",
-    "📧 Cevap Yaz (Mail)": "Bu gelen bir e-posta, buna kibar ve profesyonel bir cevap metni taslağı yaz.",
-    "🎮 PS5 Oyun Skor + Acımasız Yorum": (
-        "Seçili metni bir PS5 oyunu adı olarak ele al. Aşağıdaki formatta Türkçe cevap ver:\n"
-        "1) Oyun: <ad>\n"
-        "2) Topluluk Beğeni Skorları:\n"
-        "- Metacritic User Score: <değer veya 'bilgi yok'>\n"
-        "- OpenCritic / benzer eleştirmen ortalaması: <değer veya 'bilgi yok'>\n"
-        "- Oyuncu yorumu ortalaması (PS Store vb.): <değer veya 'bilgi yok'>\n"
-        "3) Hüküm: sadece 'IYI' veya 'KOTU'\n"
-        "4) Acımasız Yorum: 2-4 cümle, net ve sert.\n"
-        "Kurallar: Kesin bilmediğin puanı uydurma, onun yerine 'bilgi yok' yaz. "
-        "Yorumu skorlarla tutarlı kur."
+    "👔 Kurumsala Çevir (Öfke Kontrolü)": (
+        "Bu metindeki kaba, duygusal, argo veya sitemkar ifadeleri tamamen temizle. "
+        "Yerine son derece profesyonel, kibar, çözüm odaklı ve kurumsal bir e-posta dili yaz. "
+        "Sadece çevrilmiş profesyonel metni ver, başka açıklama yapma."
     ),
+    "📋 Özetle ve Görevleri Çıkar": (
+        "Bu uzun metni dikkatlice oku. Metnin ana fikrini 2 cümleyle özetle. "
+        "Ardından, eğer metinde yapılması gereken işler, tarihler veya görev dağılımları varsa "
+        "bunları kısa bir 'Yapılacaklar Listesi' (Madde Madde) olarak çıkar."
+    ),
+    "🚀 Staj/İş Başvurusu Yaz (Cover Letter)": (
+        "Bu seçili metin bir iş veya staj ilanıdır. Bu ilana başvurmak isteyen hevesli ve "
+        "öğrenmeye açık bir öğrenci ağzından; ilandaki anahtar kelimeleri içeren, "
+        "etkileyici ve profesyonel bir ön yazı (cover letter) taslağı oluştur."
+    ),
+    "🛒 Alışveriş Listesi Çıkar": (
+        "Bu metin bir yemek tarifidir. Bu tarifi yapmak için gereken malzemeleri çıkar ve "
+        "onları marketteki reyonlara göre (Manav, Süt Ürünleri, Kasap vb.) "
+        "gruplandırarak temiz bir alışveriş listesi yap."
+    ),
+     "🍷 Buna Ne Gider? (Eşleşme Önerici)": (
+        "Bu malzemeye veya yemeğe en iyi eşlik edecek diğer malzemeleri, baharatları ve içecek eşleşmelerini öner. "
+        "Neden yakıştıklarını kısaca açıkla. Madde madde ve iştah açıcı bir dille yaz."
+    ),
+    "⚖️ Kalori & Besin Değeri Analizi": (
+        "Bu tarifteki malzemelerin miktarlarına göre yaklaşık toplam kalori, protein, karbonhidrat ve yağ değerlerini hesapla. "
+        "Eğer miktar belirtilmemişse genel porsiyon üzerinden tahmin yap. Sonucu okunaklı bir tablo veya liste halinde ver."
+    ),
+    "🔄 Malzeme Değiştirici (Alternatif)": (
+        "Bu tarifteki ana malzemelerden biri eksikse veya alerji/tercih nedeniyle değiştirilmek isteniyorsa "
+        "yerine ne kullanılabileceğini, bu değişikliğin tadı ve kıvamı nasıl etkileyeceğini anlat."
+    ),
+    "📏 Birim Dönüştürücü (Metrik)": (
+        "Metindeki tüm yabancı ölçü birimlerini (cup, oz, lb, fahrenheit, vb.) metrik sisteme (gram, ml, celsius) çevir. "
+        "Sadece güncellenmiş metni ver, açıklama yapma."
+    )
 }
 
 
@@ -122,6 +148,30 @@ def ollama_cevap_al(prompt):
         err_msg = f"Beklenmeyen Hata: {e}"
         print(f"❌ {err_msg}")
         gui_queue.put((messagebox.showerror, ("Hata", err_msg)))
+        return None
+
+
+def gemini_cevap_al(prompt):
+    """Gemini AI API'den cevap al."""
+    if not genai:
+        err_msg = "google-genai kütüphanesi yüklü değil! 'kurulum.bat'ı çalıştırın."
+        gui_queue.put((messagebox.showerror, ("Kütüphane Hatası", err_msg)))
+        return None
+
+    try:
+        client = genai.Client(api_key=GEMINI_API_KEY)
+        response = client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt,
+        )
+        return response.text.strip()
+    except Exception as e:
+        err_msg = (
+            f"Gemini API Hatası: {e}\n\n"
+            "Not: 'gcloud auth application-default login' yaptığınızdan emin olun."
+        )
+        print(f"❌ {err_msg}")
+        gui_queue.put((messagebox.showerror, ("Gemini Hatası", err_msg)))
         return None
 
 
@@ -223,14 +273,18 @@ def sonuc_penceresi_goster(baslik, icerik):
     pencere.lift()
 
 
-def islemi_yap(komut_adi, secili_metin):
+def islemi_yap(komut_adi, secili_metin, engine="ollama"):
     prompt_emri = ISLEMLER[komut_adi]
     full_prompt = f"{prompt_emri}:\n\n'{secili_metin}'"
 
-    print(f"🤖 İşlem: {komut_adi}")
-    print("⏳ Ollama ile işleniyor...")
+    print(f"🤖 İşlem: {komut_adi} ({engine})")
+    print(f"⏳ {engine.capitalize()} ile işleniyor...")
 
-    sonuc = ollama_cevap_al(full_prompt)
+    if engine == "gemini":
+        sonuc = gemini_cevap_al(full_prompt)
+    else:
+        sonuc = ollama_cevap_al(full_prompt)
+
     if not sonuc:
         print("❌ Sonuç alınamadı.")
         return
@@ -266,7 +320,7 @@ def process_queue():
             root.after(100, process_queue)
 
 
-def menu_goster():
+def menu_goster(engine="ollama"):
     """Metni kopyalar ve menüyü gösterir (ana thread)."""
     secili_metin = secili_metni_kopyala()
     if not secili_metin.strip():
@@ -291,16 +345,18 @@ def menu_goster():
         font=("Segoe UI", 10),
     )
 
-    def komut_olustur(k_adi, s_metin):
+    def komut_olustur(k_adi, s_metin, eng):
         def komut_calistir():
             threading.Thread(
-                target=islemi_yap, args=(k_adi, s_metin), daemon=True
+                target=islemi_yap, args=(k_adi, s_metin, eng), daemon=True
             ).start()
 
         return komut_calistir
 
     for baslik in ISLEMLER.keys():
-        menu.add_command(label=baslik, command=komut_olustur(baslik, secili_metin))
+        menu.add_command(
+            label=baslik, command=komut_olustur(baslik, secili_metin, engine)
+        )
 
     menu.add_separator()
     menu.add_command(label="❌ İptal", command=lambda: None)
@@ -313,20 +369,21 @@ def menu_goster():
 
 
 def on_press(key):
-    global kisayol_basildi
+    global kisayol_basildi_key
     try:
-        if key == KISAYOL_METIN and not kisayol_basildi:
-            kisayol_basildi = True
-            gui_queue.put((menu_goster, ()))
+        if (key == KISAYOL_METIN or key == KISAYOL_GEMINI) and kisayol_basildi_key is None:
+            kisayol_basildi_key = key
+            engine = "gemini" if key == KISAYOL_GEMINI else "ollama"
+            gui_queue.put((menu_goster, (engine,)))
     except AttributeError:
         pass
 
 
 def on_release(key):
-    global kisayol_basildi
+    global kisayol_basildi_key
     try:
-        if key == KISAYOL_METIN:
-            kisayol_basildi = False
+        if key == KISAYOL_METIN or key == KISAYOL_GEMINI:
+            kisayol_basildi_key = None
     except AttributeError:
         pass
 
@@ -336,10 +393,12 @@ if __name__ == "__main__":
     print("🤖 AI Asistan - Metin İşleme")
     print("=" * 60)
     aktif_text_model = get_available_text_model()
-    print(f"📦 Metin İşleme (F8): {aktif_text_model}")
+    print(f"📦 Yerel Model (F8): {aktif_text_model}")
+    print(f"☁️ Gemini Model (F9): {GEMINI_MODEL}")
     print()
     print("🔧 Kullanım:")
-    print("   F8 - Metin sec ve AI islemleri yap")
+    print("   F8 - Metin seç ve Yerel AI işlemleri yap")
+    print("   F9 - Metin seç ve Gemini 3 Flash işlemleri yap")
     print()
     print("⚠️ Programı kapatmak için bu pencereyi kapatın veya Ctrl+C yapın.")
     print("=" * 60)

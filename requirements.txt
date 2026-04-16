@@ -1,7 +1,8 @@
-﻿requests
+requests
 pyperclip
 pynput
 pyautogui
 sympy
 Pillow
 PyMuPDF
+google-genai
