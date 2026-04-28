@@ -1,83 +1,80 @@
-# AI Assistant: Hybrid Clipboard Master 🚀
+# 🚀 AI Assistant: Hybrid Clipboard Master
 
-AI Assistant, günlük metin işleme ve mutfak/tarif analiz süreçlerinizi hızlandırmak için tasarlanmış, **Ollama** (Yerel LLM) ve **Gemini 3 Flash** (Cloud LLM) destekli bir arka plan yardımcı aracıdır.
+## 📖 Projenin Amacı ve Özeti
+**AI Assistant**, kullanıcının dijital çalışma akışını kesintiye uğratmadan, herhangi bir uygulama içerisindeki metinleri anında yapay zeka ile işlemesini sağlayan verimlilik odaklı bir araçtır. Proje, hem **yerel (local)** hem de **bulut (cloud)** tabanlı yapay zeka modellerini tek bir çatı altında birleştirerek, kullanıcının ihtiyacına göre hız, gizlilik veya yüksek zeka arasında seçim yapmasına olanak tanır.
 
-<div align="center">
-
-[![Python](https://img.shields.io/badge/Python-3.13-blue?style=flat-square&logo=python)](https://python.org)
-[![Ollama](https://img.shields.io/badge/Ollama-Local%20AI-white?style=flat-square)](https://ollama.com)
-[![Gemini](https://img.shields.io/badge/Gemini%203-Flash%20Preview-teal?style=flat-square)](https://aistudio.google.com/)
-
-</div>
+Temel olarak, kopyala-yapıştır döngüsünü ortadan kaldırarak yapay zekayı doğrudan farenizin ucuna getirir.
 
 ---
 
-## ✨ Temel Özellikler
-
-Bu uygulama, herhangi bir uygulama içindeyken seçtiğiniz metin üzerinde akıllı AI işlemleri yapmanızı sağlar.
-
-### 🏠 Yerel & Bulut Hibrit Yapı
-- **F8 Tuşu (Yerel):** Ollama üzerinden `gemma3:1b` modelini kullanır. İnternet gerektirmeden hızlı ve gizli işlemler yapar.
-- **F9 Tuşu (Bulut):** Google Gemini 3 Flash modelini kullanır. Karmaşık analizler ve karmaşık tarifler için üstün zeka sunar.
-
-### 🛠️ Gelişmiş AI Komutları
-- **💼 Kurumsal Çeviri:** Kaba veya duygusal metinleri profesyonel e-posta diline çevirir.
-- **📝 Akıllı Özetleme:** Uzun metinleri özetler ve çıkarılması gereken görevleri (TODO) listeler.
-- **🍷 Mutfak Asistanı:** 
-    - *Buna Ne Gider?* (Eşleşme önerileri)
-    - *Kalori Analizi* (Besin değerleri hesaplama)
-    - *Alternatif Malzeme* (İçerik değiştirme önerileri)
-- **📏 Birim Dönüştürücü:** Cup, Oz, Lb gibi birimleri metrik (Gr, Ml) sisteme çevirir.
-- **🚀 Kariyer Desteği:** İş ve staj ilanları için hızlı kapak yazısı (cover letter) taslağı oluşturur.
+## 🛠️ Uygulama Ne İşe Yarar?
+Uygulama arka planda bir servis gibi çalışır ve klavyenizdeki belirli kısayolları (F8 ve F9) dinler. Kullanım akışı şu şekildedir:
+1. Herhangi bir programda (Tarayıcı, PDF, Word, vb.) bir metni seçersiniz.
+2. **F8 (Yerel AI)** veya **F9 (Gemini)** tuşuna basarsınız.
+3. Açılan şık menüden yapmak istediğiniz işlemi (Özetle, Kurumsala Çevir, Kalori Analizi vb.) seçersiniz.
+4. AI, seçtiğiniz metni işler ve sonucu otomatik olarak seçili metnin yerine **yapıştırır** veya size sunar.
 
 ---
 
-## 🚀 Hızlı Başlangıç
+## 💡 İnsanlar Bunu Niye Kullansın?
+*   **Zaman Tasarrufu:** Metni kopyalayıp tarayıcıya gitme, prompt yazma ve sonucu geri getirme zahmetinden kurtarır.
+*   **Gizlilik ve Güvenlik:** F8 (Ollama) entegrasyonu sayesinde hassas verileriniz internete çıkmadan, tamamen kendi bilgisayarınızda işlenir.
+*   **Özelleşmiş Modlar:** Kurumsal iletişimden yemek tariflerine, iş başvurularından birim dönüştürmeye kadar hazır prompt senaryoları sunar.
+*   **Hibrit Esneklik:** İnternet yokken yerel modellerle çalışmaya devam edebilir, karmaşık analizler içinse tek tuşla Gemini 3 Flash'ın gücüne başvurabilirsiniz.
 
-### 1. Hazırlık
-Uygulamayı çalıştırmadan önce sisteminizde şunların olduğundan emin olun:
-- **Ollama Kurulumu:** [ollama.com](https://ollama.com/) adresinden kurun ve terminalde `ollama run gemma3:1b` komutunu çalıştırın.
-- **Python 3.13:** En güncel Python sürümü önerilir.
+---
 
-### 2. Kurulum ve Çalıştırma
-Projeyi kendi bilgisayarınıza kurmak için sadece `BASLAT.bat` dosyasını çalıştırmanız yeterlidir.
-- `BASLAT.bat` otomatik olarak bir sanal ortam (`.venv`) oluşturur.
-- Gerekli tüm kütüphaneleri (`requirements.txt`) yükler.
-- `main.pyw` dosyasını arka planda başlatır.
+## ✨ Özellikler
 
-### 3. Gemini API Yapılandırması
-Gemini Flash özelliklerini (F9) kullanmak için:
-1. `main.pyw` dosyasını açın.
-2. `GEMINI_API_KEY` değişkenine [Google AI Studio](https://aistudio.google.com/app/apikey)'dan aldığınız anahtarı ekleyin.
+### 🤖 Hibrit AI Desteği
+- **F8 (Local):** [Ollama](https://ollama.com/) üzerinden `gemma3:1b` gibi hafif modelleri kullanarak hızlı ve çevrimdışı işlem yapar.
+- **F9 (Cloud):** Google'ın en yeni [Gemini 3 Flash](https://aistudio.google.com/) modelini kullanarak karmaşık ve yaratıcı analizler sunar.
+
+### 📝 Hazır İşlem Menüsü
+- **💼 Kurumsala Çevir:** Duygusal veya kaba metinleri anında profesyonel bir e-posta diline dönüştürür.
+- **🔍 Özetle & Görev Çıkar:** Uzun metinlerden ana fikri ve yapılacaklar (TODO) listesini süzer.
+- **🍳 Mutfak Asistanı:** Yemek tariflerini analiz eder; alışveriş listesi çıkarır, kalori hesabı yapar veya alternatif malzeme önerir.
+- **📄 Kariyer Desteği:** İş ilanlarına uygun profesyonel ön yazı (Cover Letter) taslakları hazırlar.
+- **📏 Birim Dönüştürücü:** Ölçü birimlerini (Oz, Cup, Lb) otomatik olarak metrik sisteme çevirir.
+
+---
+
+## 🚀 Kurulum
+
+### 1. Gereksinimler
+- **Python 3.10+** (Görsel arayüz ve mantık için)
+- **Ollama** (Yerel model desteği için): [Buradan indirin](https://ollama.com/)
+- **Gemini API Key** (F9 özelliklerini kullanmak için): [Google AI Studio](https://aistudio.google.com/app/apikey)
+
+### 2. Adımlar
+Projeyi hızlıca kurmak ve çalıştırmak için klasördeki `.bat` dosyalarını kullanabilirsiniz:
+1. `kurulum.bat` dosyasını çalıştırın (Gerekli kütüphaneleri ve sanal ortamı kurar).
+2. `BASLAT.bat` dosyasını çalıştırın (Uygulamayı arka planda başlatır).
+
+> [!TIP]
+> Gemini modelini kullanabilmek için `main.pyw` dosyasındaki `GEMINI_API_KEY` değişkenine kendi anahtarınızı yapıştırın.
 
 ---
 
 ## ⌨️ Kullanım Kılavuzu
 
-1. Herhangi bir programda (Tarayıcı, Word, Not Defteri vb.) bir metni fare ile seçin.
-2. Yerel AI için **F8**'e, Gemini için **F9**'a basın.
-3. Açılan şık menüden istediğiniz işlemi seçin.
-4. AI, sonucu hazırlayıp seçtiğiniz metnin yerine otomatik olarak **yapıştıracaktır**.
+| Kısayol | İşlem | Açıklama |
+| :--- | :--- | :--- |
+| **F8** | **Local AI (Ollama)** | Seçili metni yerel modelinizle işler. Hızlı ve gizlidir. |
+| **F9** | **Cloud AI (Gemini)** | Seçili metni Gemini 3 Flash ile işler. Daha zekice analizler yapar. |
 
 ---
 
 ## 📂 Dosya Yapısı
-
-- `main.pyw`: Görsel arayüz (Tkinter) ve klavye dinleyici motoru.
-- `kurulum.bat`: Sanal ortam ve paket kurulum otomasyonu.
-- `BASLAT.bat`: Uygulamayı tek tıkla başlatan script.
-- `requirements.txt`: Proje bağımlılıkları.
+- `main.pyw`: Uygulamanın ana motoru (Kısayol dinleyici ve GUI).
+- `requirements.txt`: Gerekli Python kütüphaneleri.
+- `kurulum.bat`: Tek tıkla kurulum scripti.
+- `BASLAT.bat`: Tek tıkla başlatma scripti.
 
 ---
 
 ## 🤝 Katkıda Bulunma
-
-Bu bir ödev/proje çalışmasıdır. Geliştirmek isterseniz lütfen:
-1. Projeyi **Fork** edin.
-2. Yeni bir branch oluşturun (`git checkout -b feature/yeniozellik`).
-3. Değişikliklerinizi commit edin (`git commit -m 'Yeni özellik eklendi'`).
-4. Branch'inizi push edin (`git push origin feature/yeniozellik`).
-5. Bir **Pull Request** açın.
+Bu proje geliştirilmeye açıktır. Yeni özellikler eklemek veya hata bildirmek isterseniz lütfen bir Issue açın veya Pull Request gönderin.
 
 ---
 
